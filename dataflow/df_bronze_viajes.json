@@ -160,7 +160,7 @@
 				"     skipDuplicateMapOutputs: true) ~> select2",
 				"xls2023 select(mapColumn(",
 				"          fecha_servicio,",
-				"          cod_ruta,",
+				"          RutaHistoricaId = cod_ruta,",
 				"          nro_parada,",
 				"          franja,",
 				"          estimacion_abordajes,",
