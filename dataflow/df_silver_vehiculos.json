@@ -35,7 +35,10 @@
 					"name": "filter1"
 				},
 				{
-					"name": "aggregate1"
+					"name": "window1"
+				},
+				{
+					"name": "filter2"
 				},
 				{
 					"name": "select1"
@@ -77,15 +80,12 @@
 				"!isNull(Estado) &&",
 				"trim(Estado) != ''",
 				") ~> filter1",
-				"filter1 aggregate(groupBy(VehiculoId,",
-				"          Placa,",
-				"          TipoVehiculo,",
-				"          CapacidadEfectiva,",
-				"          VigenciaDesde,",
-				"          VigenciaHasta,",
-				"          Estado),",
-				"     cantidadregistros = count()) ~> aggregate1",
-				"aggregate1 select(mapColumn(",
+				"filter1 window(over(VehiculoId),",
+				"     desc(VigenciaDesde, true),",
+				"     desc(VigenciaHasta, true),",
+				"     NumeroFila = rowNumber()) ~> window1",
+				"window1 filter(NumeroFila == 1) ~> filter2",
+				"filter2 select(mapColumn(",
 				"          VehiculoId,",
 				"          Placa,",
 				"          TipoVehiculo,",
