@@ -30,6 +30,15 @@
 				},
 				{
 					"name": "derivedColumn2"
+				},
+				{
+					"name": "filter1"
+				},
+				{
+					"name": "aggregate1"
+				},
+				{
+					"name": "select1"
 				}
 			],
 			"scriptLines": [
@@ -55,7 +64,39 @@
 				"          VigenciaDesde = iif(instr(VigenciaDesde, '/') > 0, toDate(VigenciaDesde, 'dd/MM/yyyy'), toDate(VigenciaDesde, 'yyyy-MM-dd')),",
 				"          VigenciaHasta = iif(instr(VigenciaHasta, '/') > 0, toDate(VigenciaHasta, 'dd/MM/yyyy'), toDate(VigenciaHasta, 'yyyy-MM-dd')),",
 				"          VehiculoId = iif(startsWith(VehiculoId, 'V-'), trim(VehiculoId), concat('V-', lpad(trim(VehiculoId), 3, '0')))) ~> derivedColumn2",
-				"derivedColumn2 sink(allowSchemaDrift: true,",
+				"derivedColumn2 filter(",
+				"!isNull(VehiculoId) &&",
+				"trim(VehiculoId) != '' &&",
+				"!isNull(Placa) &&",
+				"trim(Placa) != '' &&",
+				"!isNull(TipoVehiculo) &&",
+				"trim(TipoVehiculo) != '' &&",
+				"!isNull(CapacidadEfectiva) &&",
+				"!isNull(VigenciaDesde) &&",
+				"!isNull(VigenciaHasta) &&",
+				"!isNull(Estado) &&",
+				"trim(Estado) != ''",
+				") ~> filter1",
+				"filter1 aggregate(groupBy(VehiculoId,",
+				"          Placa,",
+				"          TipoVehiculo,",
+				"          CapacidadEfectiva,",
+				"          VigenciaDesde,",
+				"          VigenciaHasta,",
+				"          Estado),",
+				"     cantidadregistros = count()) ~> aggregate1",
+				"aggregate1 select(mapColumn(",
+				"          VehiculoId,",
+				"          Placa,",
+				"          TipoVehiculo,",
+				"          CapacidadEfectiva,",
+				"          VigenciaDesde,",
+				"          VigenciaHasta,",
+				"          Estado",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select1",
+				"select1 sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     input(",
 				"          VehiculoId as string,",

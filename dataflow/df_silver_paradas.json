@@ -33,6 +33,15 @@
 				},
 				{
 					"name": "derivedColumn3"
+				},
+				{
+					"name": "filter1"
+				},
+				{
+					"name": "aggregate1"
+				},
+				{
+					"name": "select1"
 				}
 			],
 			"scriptLines": [
@@ -59,7 +68,46 @@
 				"          Longitud = toDecimal(trim(Longitud))) ~> derivedColumn2",
 				"derivedColumn2 derive(VigenciaDesde = iif(instr(VigenciaDesde, '/') > 0, toDate(VigenciaDesde, 'dd/MM/yyyy'), toDate(VigenciaDesde, 'yyyy-MM-dd')),",
 				"          VigenciaHasta = iif(instr(VigenciaHasta, '/') > 0, toDate(VigenciaHasta, 'dd/MM/yyyy'), toDate(VigenciaHasta, 'yyyy-MM-dd'))) ~> derivedColumn3",
-				"derivedColumn3 sink(allowSchemaDrift: true,",
+				"derivedColumn3 filter(",
+				"!isNull(ParadaHistoricaId) &&",
+				"trim(ParadaHistoricaId) != '' &&",
+				"!isNull(CodigoPublicado) &&",
+				"trim(CodigoPublicado) != '' &&",
+				"!isNull(NombreParada) &&",
+				"trim(NombreParada) != '' &&",
+				"!isNull(Zona) &&",
+				"trim(Zona) != '' &&",
+				"!isNull(Latitud) &&",
+				"!isNull(Longitud) &&",
+				"!isNull(VigenciaDesde) &&",
+				"!isNull(VigenciaHasta) &&",
+				"!isNull(Estado) &&",
+				"trim(Estado) != ''",
+				") ~> filter1",
+				"filter1 aggregate(groupBy(ParadaHistoricaId,",
+				"          CodigoPublicado,",
+				"          NombreParada,",
+				"          Zona,",
+				"          Latitud,",
+				"          Longitud,",
+				"          VigenciaDesde,",
+				"          VigenciaHasta,",
+				"          Estado),",
+				"     cantidadregistros = count()) ~> aggregate1",
+				"aggregate1 select(mapColumn(",
+				"          ParadaHistoricaId,",
+				"          CodigoPublicado,",
+				"          NombreParada,",
+				"          Zona,",
+				"          Latitud,",
+				"          Longitud,",
+				"          VigenciaDesde,",
+				"          VigenciaHasta,",
+				"          Estado",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select1",
+				"select1 sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     input(",
 				"          ParadaHistoricaId as string,",
