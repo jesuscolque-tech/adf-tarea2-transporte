@@ -1,6 +1,251 @@
 {
 	"name": "pipeline_silver",
 	"properties": {
+		"activities": [
+			{
+				"name": "Data flow1",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "df_silver_rutas",
+						"type": "DataFlowReference"
+					},
+					"compute": {
+						"coreCount": 8,
+						"computeType": "General"
+					},
+					"traceLevel": "Fine"
+				}
+			},
+			{
+				"name": "Data flow2",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [
+					{
+						"activity": "Data flow1",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "df_silver_paradas",
+						"type": "DataFlowReference"
+					},
+					"compute": {
+						"coreCount": 8,
+						"computeType": "General"
+					},
+					"traceLevel": "Fine"
+				}
+			},
+			{
+				"name": "Data flow3",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [
+					{
+						"activity": "Data flow2",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "df_silver_vehiculos",
+						"type": "DataFlowReference"
+					},
+					"compute": {
+						"coreCount": 8,
+						"computeType": "General"
+					},
+					"traceLevel": "Fine"
+				}
+			},
+			{
+				"name": "Data flow4",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [
+					{
+						"activity": "Data flow3",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "df_silver_incidentes",
+						"type": "DataFlowReference"
+					},
+					"compute": {
+						"coreCount": 8,
+						"computeType": "General"
+					},
+					"traceLevel": "Fine"
+				}
+			},
+			{
+				"name": "Data flow5",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [
+					{
+						"activity": "Data flow4",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "df_silver_incidentes_ruta",
+						"type": "DataFlowReference"
+					},
+					"compute": {
+						"coreCount": 8,
+						"computeType": "General"
+					},
+					"traceLevel": "Fine"
+				}
+			},
+			{
+				"name": "Data flow6",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [
+					{
+						"activity": "Data flow5",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "df_silver_demanda_paradas",
+						"type": "DataFlowReference"
+					},
+					"compute": {
+						"coreCount": 8,
+						"computeType": "General"
+					},
+					"traceLevel": "Fine"
+				}
+			},
+			{
+				"name": "Data flow7",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [
+					{
+						"activity": "Data flow6",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "df_silver_viajes",
+						"type": "DataFlowReference"
+					},
+					"compute": {
+						"coreCount": 8,
+						"computeType": "General"
+					},
+					"traceLevel": "Fine"
+				}
+			},
+			{
+				"name": "Script1",
+				"type": "Script",
+				"dependsOn": [
+					{
+						"activity": "Data flow7",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"linkedServiceName": {
+					"referenceName": "sql_dw_transporte",
+					"type": "LinkedServiceReference"
+				},
+				"typeProperties": {
+					"scripts": [
+						{
+							"type": "Query",
+							"text": "\nSET XACT_ABORT ON;\n\nBEGIN TRANSACTION;\n\nINSERT INTO silver.Viajes (\n    ViajeId,\n    RutaHistoricaId,\n    VehiculoId,\n    FechaServicio,\n    HoraProgramada,\n    HoraSalida,\n    HoraLlegada,\n    ValidacionesTarjeta,\n    KmRecorridos,\n    EstadoViaje\n)\nSELECT\n    s.ViajeId,\n    s.RutaHistoricaId,\n    s.VehiculoId,\n    s.FechaServicio,\n    TRY_CONVERT(TIME, s.HoraProgramada),\n    TRY_CONVERT(TIME, s.HoraSalida),\n    TRY_CONVERT(TIME, s.HoraLlegada),\n    s.ValidacionesTarjeta,\n    s.KmRecorridos,\n    s.EstadoViaje\nFROM dbo.Staging_Viajes AS s\nWHERE\n    s.ViajeId IS NOT NULL\n    AND s.RutaHistoricaId IS NOT NULL\n    AND s.VehiculoId IS NOT NULL\n    AND s.FechaServicio IS NOT NULL\n    AND s.ValidacionesTarjeta IS NOT NULL\n    AND s.KmRecorridos IS NOT NULL\n    AND s.EstadoViaje IS NOT NULL\n\n    -- Validar las tres horas\n    AND TRY_CONVERT(TIME, s.HoraProgramada) IS NOT NULL\n    AND TRY_CONVERT(TIME, s.HoraSalida) IS NOT NULL\n    AND TRY_CONVERT(TIME, s.HoraLlegada) IS NOT NULL\n\n    -- Verificar que exista la ruta\n    AND EXISTS (\n        SELECT 1\n        FROM silver.Rutas AS r\n        WHERE r.RutaHistoricaId = s.RutaHistoricaId\n    )\n\n    -- Verificar que exista el vehiculo\n    AND EXISTS (\n        SELECT 1\n        FROM silver.Vehiculos AS v\n        WHERE v.VehiculoId = s.VehiculoId\n    )\n\n    -- Evitar IDs ya insertados\n    AND NOT EXISTS (\n        SELECT 1\n        FROM silver.Viajes AS v\n        WHERE v.ViajeId = s.ViajeId\n    )\n\n    -- Evitar duplicados en la tabla auxiliar\n    AND s.ViajeId IN (\n        SELECT ViajeId\n        FROM dbo.Staging_Viajes\n        GROUP BY ViajeId\n        HAVING COUNT(*) = 1\n    );\n\nCOMMIT TRANSACTION;\n"
+						}
+					],
+					"scriptBlockExecutionTimeout": "02:00:00"
+				}
+			}
+		],
 		"annotations": []
 	}
 }
