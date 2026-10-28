@@ -1,0 +1,63 @@
+{
+	"name": "auxiliar",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "sql_dw_transporte",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "Silver"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "ViajeId",
+				"type": "nvarchar"
+			},
+			{
+				"name": "RutaHistoricaId",
+				"type": "nvarchar"
+			},
+			{
+				"name": "VehiculoId",
+				"type": "nvarchar"
+			},
+			{
+				"name": "FechaServicio",
+				"type": "date"
+			},
+			{
+				"name": "HoraProgramada",
+				"type": "nvarchar"
+			},
+			{
+				"name": "HoraSalida",
+				"type": "nvarchar"
+			},
+			{
+				"name": "HoraLlegada",
+				"type": "nvarchar"
+			},
+			{
+				"name": "ValidacionesTarjeta",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "KmRecorridos",
+				"type": "decimal",
+				"precision": 8,
+				"scale": 1
+			},
+			{
+				"name": "EstadoViaje",
+				"type": "nvarchar"
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "Staging_Viajes"
+		}
+	}
+}
